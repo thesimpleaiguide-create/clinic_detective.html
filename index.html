@@ -5,16 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinic Detective | Stakeholder POC</title>
     
-    <!-- URL FIXER: Automatically removes the trailing slash that breaks images -->
-    <script>
-        if (window.location.pathname.endsWith('/')) {
-            const cleanPath = window.location.pathname.slice(0, -1);
-            if (cleanPath.endsWith('.html')) {
-                window.location.replace(window.location.origin + cleanPath);
-            }
-        }
-    </script>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -30,7 +20,7 @@
             overflow: hidden;
         }
 
-        /* Custom scrollbar */
+        /* Scrollbar styling */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
@@ -43,12 +33,13 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 16:9 Board - Bulletproof pathing */
+        /* 16:9 Board - Hardcoded absolute URL for total reliability */
         #board-container {
             max-height: 60vh; 
             width: 100%;
             aspect-ratio: 16 / 9; 
             margin: 0 auto;
+            background-image: url('https://thesimpleaiguide-create.github.io/clinic-board.jpeg');
             background-size: 100% 100%; 
             background-repeat: no-repeat;
             background-position: center;
@@ -69,13 +60,11 @@
             padding: 4px;
         }
 
-        /* Polished Profile Styling */
-        .avatar-main {
+        .avatar-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: 50%;
-            background-color: #1e293b;
         }
 
         .game-tile {
@@ -91,13 +80,13 @@
 </head>
 <body class="p-4 lg:p-6">
 
-    <!-- Premium Header -->
+    <!-- Header -->
     <header class="w-full max-w-7xl mx-auto mb-6 flex justify-between items-end px-2">
         <div class="flex flex-col">
             <h1 class="text-3xl font-black tracking-tighter text-blue-400 uppercase leading-none">Clinic Detective</h1>
             <div class="flex items-center gap-3 mt-1">
                 <span class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">
-                    Intelligence Unit | Patience Waites | <span id="status-text" class="text-blue-300 font-black">PHASE: BRIEFING</span>
+                    Intelligence Unit | Patience Waites | <span id="status-text" class="text-blue-300 font-black uppercase">PHASE: BRIEFING</span>
                 </span>
             </div>
         </div>
@@ -123,7 +112,7 @@
                 </div>
                 
                 <p class="text-lg text-slate-400 leading-relaxed">
-                    Investigate the floor to gather clues. You must distinguish between objective evidence and <strong>Red Herrings</strong> to solve the case.
+                    Navigate the floor to gather clues. You must distinguish between objective evidence and <strong>Red Herrings</strong> to solve the case.
                 </p>
 
                 <button onclick="startGame()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-5 rounded-2xl transition-all flex items-center justify-center gap-3 text-xl shadow-lg transform active:scale-95">
@@ -131,10 +120,10 @@
                 </button>
             </div>
 
-            <!-- Profile Display -->
+            <!-- Profile Display - Hardcoded Absolute URL -->
             <div class="flex flex-col items-center gap-4">
                 <div class="w-56 h-56 rounded-full border-4 border-emerald-500/30 p-1 shadow-2xl bg-slate-900 overflow-hidden">
-                    <img id="briefing-avatar" src="" alt="" class="avatar-main">
+                    <img id="briefing-avatar" src="https://thesimpleaiguide-create.github.io/patience-avatar.jpeg" alt="Patience Waites" class="avatar-img">
                 </div>
                 <div class="text-center">
                     <p class="text-xl font-bold text-white uppercase tracking-tighter">Patience Waites</p>
@@ -152,7 +141,7 @@
                 <div id="grid-container" class="grid grid-cols-10 grid-rows-8 gap-0.5 z-10"></div>
             </div>
 
-            <!-- Tactical UI -->
+            <!-- Interactive UI -->
             <div class="bg-slate-800 rounded-3xl border border-slate-700 p-3 flex items-center justify-between shadow-xl">
                 <div id="dice-controls" class="flex items-center gap-4"></div>
                 <button onclick="setPhase('deduction')" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-black py-4 px-8 rounded-2xl flex items-center gap-2 shadow-lg uppercase tracking-widest transition-all transform active:scale-95 border-b-4 border-amber-800">
@@ -162,12 +151,12 @@
             </div>
         </div>
 
-        <!-- Intelligence Sidebar -->
+        <!-- Evidence Sidebar -->
         <div class="w-full lg:w-[320px] flex flex-col h-full overflow-hidden">
             <div class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden shadow-xl">
                 <div class="flex justify-between items-center mb-6 pb-2 border-b border-white/10">
                     <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <i data-lucide="search" class="w-4 h-4 text-blue-400"></i> Evidence Log
+                        <i data-lucide="search" class="w-4 h-4 text-blue-400"></i> Intelligence Log
                     </h3>
                     <div class="text-xs font-black text-blue-400">
                         <span id="evidence-count">0</span> / 5
@@ -178,7 +167,7 @@
         </div>
     </div>
 
-    <!-- Phase 3: Case Finalization -->
+    <!-- Phase 3: Selection -->
     <div id="phase-deduction" class="phase-hidden w-full max-w-lg bg-slate-800 rounded-[40px] p-10 border border-slate-700 shadow-2xl mt-4 mx-auto flex-col items-center">
         <h2 class="text-3xl font-black text-amber-400 mb-6 uppercase tracking-tighter">Case Finalization</h2>
         <div id="deduction-clue-count" class="bg-slate-900/80 p-4 rounded-xl mb-8 text-sm text-slate-400 italic text-center w-full border border-slate-700"></div>
@@ -188,7 +177,7 @@
                 <select id="select-driver" onchange="checkDeductionValid()" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-4 text-sm text-white outline-none focus:border-blue-500 transition-all"></select>
             </div>
             <div class="space-y-2">
-                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Response Protocol</label>
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Strategic Protocol</label>
                 <select id="select-tool" onchange="checkDeductionValid()" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-4 text-sm text-white outline-none focus:border-blue-500 transition-all"></select>
             </div>
             <button id="btn-submit-deduction" disabled onclick="submitDeduction()" class="w-full py-5 rounded-2xl font-black text-lg bg-slate-700 text-slate-500 cursor-not-allowed uppercase tracking-widest mt-4 shadow-2xl transition-all">
@@ -207,7 +196,7 @@
             <div class="space-y-5">
                 <div class="grid grid-cols-2 gap-4 text-sm">
                     <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700"><p class="text-[9px] text-slate-500 uppercase font-black mb-1">Your Audit</p><p id="audit-driver" class="text-white font-bold"></p></div>
-                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-blue-500/20"><p class="text-[9px] text-blue-400 uppercase font-black mb-1">Expert Protocol</p><p id="correct-driver" class="text-white font-bold"></p></div>
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-blue-500/20"><p class="text-[9px] text-blue-400 uppercase font-black mb-1">Correct Protocol</p><p id="correct-driver" class="text-white font-bold"></p></div>
                 </div>
                 <div class="bg-slate-700/30 p-6 rounded-2xl border border-slate-600 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
@@ -215,22 +204,14 @@
                     <p id="debrief-text" class="text-slate-200 text-sm leading-relaxed"></p>
                 </div>
             </div>
-            <button onclick="resetGame()" class="mt-8 w-full bg-slate-100 hover:bg-white text-slate-900 font-black py-5 rounded-2xl text-md transition-all uppercase tracking-widest shadow-xl transform active:scale-95">Restart Shift</button>
+            <button onclick="resetGame()" class="mt-8 w-full bg-slate-100 hover:bg-white text-slate-900 font-black py-5 rounded-2xl text-md transition-all uppercase tracking-widest shadow-xl transform active:scale-95">Restart Assignment</button>
         </div>
     </div>
 
     <script>
-        // --- ASSET PATH LOGIC ---
-        const getAssetPath = (fileName) => {
-            const loc = window.location.pathname;
-            // Clean up directory if it's the root or ends in .html
-            let dir = loc.substring(0, loc.lastIndexOf('/'));
-            if (dir === "") dir = "";
-            return window.location.origin + dir + "/" + fileName + "?v=" + new Date().getTime();
-        };
-
-        const avatarUrl = getAssetPath('patience-avatar.jpeg');
-        const boardUrl = getAssetPath('clinic-board.jpeg');
+        // --- ASSETS: ABSOLUTE LINKS TO BYPASS BROWSER CACHE AND FOLDER BUGS ---
+        const hardcodedAvatar = "https://thesimpleaiguide-create.github.io/patience-avatar.jpeg";
+        const hardcodedBoard = "https://thesimpleaiguide-create.github.io/clinic-board.jpeg";
         
         const START_POSITION = '2-8';
         const pathSpaces = [
@@ -244,7 +225,7 @@
             evidence: [
                 { id: 'ev1', boardPos: '2-5', icon: "user", content: "I've been a patient here for 30 years! I shouldn't have to fill in a digital form like a child!" },
                 { id: 'ev2', boardPos: '9-7', icon: "alert-triangle", content: "Receptionist replied: Everyone has to fill in the form. Those are the rules." },
-                { id: 'ev3', boardPos: '9-4', icon: "info", content: "Patient recently had a heart scare and is struggling with the new digital triage." },
+                { id: 'ev3', boardPos: '9-4', icon: "info", content: "Patient recently had a heart scare and is struggling with digital triage." },
                 { id: 'ev4', boardPos: '6-6', icon: "alert-octagon", content: "Staff Gossip: He's always looking for an excuse to shout. He likes the attention." },
                 { id: 'ev5', boardPos: '6-3', icon: "file-text", content: "Note on Desk: Just tell difficult patients NO and don't budge. They have to learn." }
             ],
@@ -261,18 +242,10 @@
         let state = { phase: 'briefing', position: START_POSITION, cluesFound: [], movesLeft: 0, diceRoll: null, isRolling: false, isMoving: false, displayEvidence: [], reachableTiles: new Set() };
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Apply absolute paths
-            const board = document.getElementById('board-container');
-            if (board) board.style.backgroundImage = `url('${boardUrl}')`;
-            
-            const avatar = document.getElementById('briefing-avatar');
-            if (avatar) avatar.src = avatarUrl;
-
             const dSelect = document.getElementById('select-driver');
             if (dSelect) driversList.forEach(d => { const o = document.createElement('option'); o.value = d; o.innerText = d; dSelect.appendChild(o); });
             const tSelect = document.getElementById('select-tool');
             if (tSelect) toolsList.forEach(t => { const o = document.createElement('option'); o.value = t; o.innerText = t; tSelect.appendChild(o); });
-            
             lucide.createIcons();
         });
 
@@ -280,6 +253,7 @@
             state.phase = newPhase;
             const sText = document.getElementById('status-text');
             if (sText) sText.innerText = `PHASE: ${newPhase.toUpperCase()}`;
+            
             ['briefing', 'playing', 'deduction', 'result'].forEach(p => {
                 const el = document.getElementById(`phase-${p}`);
                 if (el) {
@@ -289,7 +263,7 @@
             });
             if (newPhase === 'deduction') {
                 const dc = document.getElementById('deduction-clue-count');
-                if (dc) dc.innerText = `${state.cluesFound.length} findings logged. Identify the driver.`;
+                if (dc) dc.innerText = `${state.cluesFound.length} items logged. Identify the driver.`;
             }
         }
 
@@ -364,7 +338,7 @@
             } else {
                 ctrl.innerHTML = `<div class="flex items-center gap-2 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 px-3 py-1.5 rounded-xl font-bold">
                     <div class="flex items-center justify-center bg-emerald-500 text-slate-900 w-5 h-5 rounded text-[10px] font-black">${state.diceRoll}</div>
-                    <i data-lucide="footprints" class="w-3 h-3 animate-pulse"></i><span class="text-[9px] uppercase tracking-tight">${state.isMoving ? 'Moving' : `${state.movesLeft} Left`}</span></div>`;
+                    <i data-lucide="footprints" class="w-3 h-3 animate-pulse"></i><span class="text-[10px] uppercase font-black tracking-tight">${state.isMoving ? 'Moving' : `${state.movesLeft} Left`}</span></div>`;
             }
 
             const grid = document.getElementById('grid-container');
@@ -382,14 +356,14 @@
                     if (cur) cls += "ring-2 ring-amber-400 z-30 shadow-lg ";
                     else if (reach) cls += "cursor-pointer hover:bg-emerald-500/30 ring-2 ring-emerald-400/40 z-20 ";
                     
-                    cls += blue ? "bg-[#2563eb]/40 " : "bg-white/40 ";
+                    cls += blue ? "bg-[#2563eb]/50 " : "bg-white/50 ";
                     if (found) cls += "opacity-10 grayscale ";
                     
                     let inner = '';
                     if (clue && !found) inner += `<i data-lucide="search" class="w-3 h-3 ${blue?'text-white/40':'text-slate-400/40'}"></i>`;
                     if (cur) {
-                        inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none p-1"><div class="w-full h-full rounded-full border-2 border-white shadow-xl overflow-hidden">
-                            <img src="${avatarUrl}" class="w-full h-full object-cover"></div></div>`;
+                        inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none p-1"><div class="w-full h-full rounded-full border-2 border-white shadow-xl overflow-hidden bg-slate-800">
+                            <img src="${hardcodedAvatar}" class="avatar-img"></div></div>`;
                     }
                     h += `<div onclick="handleTileClick('${id}')" class="${cls}">${inner}</div>`;
                 }
