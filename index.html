@@ -5,10 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinic Detective | Stakeholder POC</title>
     
+    <!-- URL FIXER: Automatically removes the trailing slash that breaks images -->
+    <script>
+        if (window.location.pathname.endsWith('/')) {
+            const cleanPath = window.location.pathname.slice(0, -1);
+            if (cleanPath.endsWith('.html')) {
+                window.location.replace(window.location.origin + cleanPath);
+            }
+        }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
 
         body {
             font-family: 'Inter', sans-serif;
@@ -26,28 +36,27 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
         
         .phase-hidden { display: none !important; }
-        .phase-active { display: flex; animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .phase-active { display: flex; animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
         
         @keyframes reveal {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 16:9 Widescreen Game Board */
+        /* 16:9 Board - Bulletproof pathing */
         #board-container {
-            max-height: 70vh; 
+            max-height: 60vh; 
             width: 100%;
             aspect-ratio: 16 / 9; 
             margin: 0 auto;
-            background-image: url('https://thesimpleaiguide-create.github.io/clinic-board.jpeg');
             background-size: 100% 100%; 
             background-repeat: no-repeat;
             background-position: center;
-            border-radius: 24px;
+            border-radius: 20px;
             background-color: #eaddc5;
             position: relative;
-            border: 8px solid #1e293b;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            border: 6px solid #1e293b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
             overflow: hidden;
         }
         
@@ -57,188 +66,172 @@
             position: absolute;
             top: 0;
             left: 0;
-            padding: 8px;
+            padding: 4px;
         }
 
-        .avatar-frame {
-            background-image: url('https://thesimpleaiguide-create.github.io/patience-avatar.jpeg');
-            background-size: cover;
-            background-position: center;
+        /* Polished Profile Styling */
+        .avatar-main {
             width: 100%;
             height: 100%;
+            object-fit: cover;
             border-radius: 50%;
+            background-color: #1e293b;
         }
 
         .game-tile {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
         }
 
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
-<body class="p-4 lg:p-8">
+<body class="p-4 lg:p-6">
 
     <!-- Premium Header -->
-    <header class="w-full max-w-7xl mx-auto mb-8 flex justify-between items-end px-2">
+    <header class="w-full max-w-7xl mx-auto mb-6 flex justify-between items-end px-2">
         <div class="flex flex-col">
-            <h1 class="text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 uppercase italic">
-                Clinic Detective
-            </h1>
-            <div class="flex items-center gap-4 mt-2">
-                <span class="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[11px] font-bold uppercase tracking-widest border border-blue-500/20">
-                    Agent: Patience Waites
-                </span>
-                <span id="status-text" class="text-slate-500 text-[11px] font-black uppercase tracking-[0.2em]">
-                    PHASE: INITIAL BRIEFING
+            <h1 class="text-3xl font-black tracking-tighter text-blue-400 uppercase leading-none">Clinic Detective</h1>
+            <div class="flex items-center gap-3 mt-1">
+                <span class="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em]">
+                    Intelligence Unit | Patience Waites | <span id="status-text" class="text-blue-300 font-black">PHASE: BRIEFING</span>
                 </span>
             </div>
         </div>
-        <div class="hidden md:flex items-center gap-6">
-            <div class="text-right">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Prototype Build</p>
-                <p class="text-xs text-emerald-500 font-bold">Stakeholder POC v3.0</p>
-            </div>
-            <div class="p-4 bg-slate-800 rounded-2xl border border-slate-700 shadow-xl">
-                <i data-lucide="stethoscope" class="text-emerald-500 w-6 h-6"></i>
-            </div>
+        <div class="p-3 bg-slate-800 rounded-2xl border border-slate-700 shadow-lg">
+            <i data-lucide="stethoscope" class="text-emerald-500 w-6 h-6"></i>
         </div>
     </header>
 
     <!-- Phase 1: Briefing -->
-    <div id="phase-briefing" class="phase-active flex-col w-full max-w-5xl glass-panel rounded-[40px] p-10 lg:p-16 shadow-2xl mt-4 mx-auto relative overflow-hidden">
-        <div class="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/10 blur-[120px]"></div>
-        
-        <div class="grid lg:grid-cols-[1fr_320px] gap-16 items-center relative z-10">
-            <div class="space-y-8">
-                <div class="flex items-center gap-4 text-emerald-400">
-                    <div class="p-3 bg-emerald-500/20 rounded-2xl">
-                        <i data-lucide="clipboard-list" class="w-10 h-10"></i>
-                    </div>
-                    <h2 class="text-5xl font-black uppercase tracking-tighter">Active Case File</h2>
+    <div id="phase-briefing" class="phase-active flex-col w-full max-w-4xl glass-panel rounded-[40px] p-8 md:p-12 shadow-2xl mt-4 mx-auto relative overflow-hidden">
+        <div class="grid md:grid-cols-[1fr_280px] gap-12 items-center relative z-10">
+            <div class="space-y-6">
+                <div class="flex items-center gap-3 text-emerald-400">
+                    <i data-lucide="file-search" class="w-8 h-8"></i>
+                    <h2 class="text-3xl font-black uppercase tracking-tight">Active Case Brief</h2>
                 </div>
                 
-                <div class="bg-slate-950/80 p-8 rounded-3xl border-l-[12px] border-emerald-500 shadow-inner">
-                    <p class="font-mono text-xs text-emerald-500/60 mb-4 uppercase tracking-[0.4em] font-bold">Incident Log:</p>
-                    <p class="text-3xl italic text-slate-100 leading-tight font-light">
+                <div class="bg-slate-950/80 p-6 rounded-2xl border-l-[8px] border-emerald-500 shadow-inner">
+                    <p class="font-mono text-[10px] text-emerald-500/60 mb-3 uppercase tracking-widest font-bold">Priority Incident:</p>
+                    <p class="text-2xl italic text-slate-100 leading-relaxed font-light">
                         "Mr. Henderson is shouting at reception, demanding an immediate GP callback for a routine prescription query."
                     </p>
                 </div>
                 
-                <p class="text-xl text-slate-400 leading-relaxed font-light max-w-2xl">
-                    Navigate the clinic floor to uncover findings. Separate objective facts from <strong>Red Herrings</strong> to solve the underlying conflict.
+                <p class="text-lg text-slate-400 leading-relaxed">
+                    Investigate the floor to gather clues. You must distinguish between objective evidence and <strong>Red Herrings</strong> to solve the case.
                 </p>
 
-                <button onclick="startGame()" class="group w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-6 rounded-3xl transition-all flex items-center justify-center gap-4 text-2xl shadow-[0_20px_50px_rgba(16,185,129,0.4)] hover:-translate-y-1">
-                    START INVESTIGATION <i data-lucide="arrow-right" class="w-8 h-8 group-hover:translate-x-2 transition-transform"></i>
+                <button onclick="startGame()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-5 rounded-2xl transition-all flex items-center justify-center gap-3 text-xl shadow-lg transform active:scale-95">
+                    INITIALIZE MISSION <i data-lucide="chevron-right" class="w-6 h-6"></i>
                 </button>
             </div>
 
-            <div class="flex flex-col items-center gap-6">
-                <div class="w-64 h-64 rounded-[60px] p-1 bg-gradient-to-tr from-emerald-500 to-blue-500 shadow-2xl rotate-3 transition-transform hover:rotate-0 duration-500">
-                    <div class="w-full h-full rounded-[56px] overflow-hidden bg-slate-900 border-4 border-slate-900">
-                        <div class="avatar-frame"></div>
-                    </div>
+            <!-- Profile Display -->
+            <div class="flex flex-col items-center gap-4">
+                <div class="w-56 h-56 rounded-full border-4 border-emerald-500/30 p-1 shadow-2xl bg-slate-900 overflow-hidden">
+                    <img id="briefing-avatar" src="" alt="" class="avatar-main">
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-black text-white uppercase tracking-tighter italic">Patience Waites</p>
-                    <p class="text-xs text-emerald-500 uppercase font-black tracking-widest opacity-80">Primary Investigator</p>
+                    <p class="text-xl font-bold text-white uppercase tracking-tighter">Patience Waites</p>
+                    <p class="text-[10px] text-emerald-500 uppercase font-black tracking-[0.2em] opacity-70">Field Investigator</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Phase 2: Playing -->
-    <div id="phase-playing" class="phase-hidden w-full max-w-7xl flex flex-col lg:grid lg:grid-cols-[1fr_380px] gap-10 h-[calc(100vh-200px)] mx-auto">
-        <div class="flex flex-col gap-8 overflow-hidden">
+    <div id="phase-playing" class="phase-hidden w-full max-w-7xl flex flex-col lg:flex-row gap-6 h-[calc(100vh-160px)] mx-auto">
+        <!-- Main Board -->
+        <div class="flex-1 flex flex-col gap-4 overflow-hidden">
             <div id="board-container">
-                <div id="grid-container" class="grid grid-cols-10 grid-rows-8 gap-1 z-10"></div>
+                <div id="grid-container" class="grid grid-cols-10 grid-rows-8 gap-0.5 z-10"></div>
             </div>
 
-            <div class="glass-panel p-5 rounded-[32px] flex items-center justify-between shadow-2xl">
-                <div id="dice-controls" class="flex items-center gap-6"></div>
-                <button onclick="setPhase('deduction')" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-black py-5 px-10 rounded-2xl flex items-center gap-3 shadow-xl uppercase tracking-widest transition-all hover:-translate-y-1 active:scale-95 border-b-4 border-amber-800">
-                    <i data-lucide="shield-alert" class="w-5 h-5"></i>
-                    Analyze Findings
+            <!-- Tactical UI -->
+            <div class="bg-slate-800 rounded-3xl border border-slate-700 p-3 flex items-center justify-between shadow-xl">
+                <div id="dice-controls" class="flex items-center gap-4"></div>
+                <button onclick="setPhase('deduction')" class="bg-amber-600 hover:bg-amber-500 text-white text-xs font-black py-4 px-8 rounded-2xl flex items-center gap-2 shadow-lg uppercase tracking-widest transition-all transform active:scale-95 border-b-4 border-amber-800">
+                    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                    Deduce Now
                 </button>
             </div>
         </div>
 
-        <div class="flex flex-col h-full overflow-hidden">
-            <div class="glass-panel rounded-[32px] p-8 flex-1 flex flex-col overflow-hidden shadow-2xl">
-                <div class="flex justify-between items-center mb-8 pb-4 border-b border-white/10">
-                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-3">
-                        <i data-lucide="fingerprint" class="w-5 h-5 text-blue-400"></i> Evidence Log
+        <!-- Intelligence Sidebar -->
+        <div class="w-full lg:w-[320px] flex flex-col h-full overflow-hidden">
+            <div class="glass-panel rounded-3xl p-6 flex-1 flex flex-col overflow-hidden shadow-xl">
+                <div class="flex justify-between items-center mb-6 pb-2 border-b border-white/10">
+                    <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <i data-lucide="search" class="w-4 h-4 text-blue-400"></i> Evidence Log
                     </h3>
-                    <div class="bg-slate-900 px-4 py-1.5 rounded-full text-sm font-black text-blue-400 border border-blue-500/20">
+                    <div class="text-xs font-black text-blue-400">
                         <span id="evidence-count">0</span> / 5
                     </div>
                 </div>
-                <div id="evidence-list" class="space-y-5 overflow-y-auto pr-2 custom-scrollbar flex-1"></div>
+                <div id="evidence-list" class="space-y-3 overflow-y-auto pr-2 custom-scrollbar flex-1"></div>
             </div>
         </div>
     </div>
 
-    <!-- Phase 3: Deduction -->
-    <div id="phase-deduction" class="phase-hidden w-full max-w-2xl glass-panel rounded-[50px] p-12 shadow-[0_50px_100px_rgba(0,0,0,0.8)] mt-4 mx-auto flex-col items-center border-t-8 border-amber-500">
-        <h2 class="text-4xl font-black text-amber-400 mb-2 uppercase tracking-tighter">Case Resolution</h2>
-        <p class="text-slate-500 text-sm mb-10 uppercase tracking-[0.3em] font-bold">Official Submission</p>
-        
-        <div id="deduction-clue-count" class="bg-slate-950/50 p-5 rounded-2xl mb-10 text-md text-slate-300 italic text-center w-full border border-white/5"></div>
-        
-        <div class="space-y-8 w-full">
+    <!-- Phase 3: Case Finalization -->
+    <div id="phase-deduction" class="phase-hidden w-full max-w-lg bg-slate-800 rounded-[40px] p-10 border border-slate-700 shadow-2xl mt-4 mx-auto flex-col items-center">
+        <h2 class="text-3xl font-black text-amber-400 mb-6 uppercase tracking-tighter">Case Finalization</h2>
+        <div id="deduction-clue-count" class="bg-slate-900/80 p-4 rounded-xl mb-8 text-sm text-slate-400 italic text-center w-full border border-slate-700"></div>
+        <div class="space-y-6 w-full text-left">
             <div class="space-y-2">
-                <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-2">Identify Patient Driver</label>
-                <select id="select-driver" onchange="checkDeductionValid()" class="w-full bg-slate-900/80 border-2 border-slate-700 rounded-2xl p-5 text-lg text-white outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer"></select>
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identify Driver</label>
+                <select id="select-driver" onchange="checkDeductionValid()" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-4 text-sm text-white outline-none focus:border-blue-500 transition-all"></select>
             </div>
             <div class="space-y-2">
-                <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-2">Strategic Response Tool</label>
-                <select id="select-tool" onchange="checkDeductionValid()" class="w-full bg-slate-900/80 border-2 border-slate-700 rounded-2xl p-5 text-lg text-white outline-none focus:border-blue-500 transition-all appearance-none cursor-pointer"></select>
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Response Protocol</label>
+                <select id="select-tool" onchange="checkDeductionValid()" class="w-full bg-slate-900 border border-slate-600 rounded-xl p-4 text-sm text-white outline-none focus:border-blue-500 transition-all"></select>
             </div>
-            <button id="btn-submit-deduction" disabled onclick="submitDeduction()" class="w-full py-6 rounded-2xl font-black text-xl bg-slate-700 text-slate-500 cursor-not-allowed uppercase tracking-widest mt-6 transition-all shadow-2xl">
-                Submit Investigation
+            <button id="btn-submit-deduction" disabled onclick="submitDeduction()" class="w-full py-5 rounded-2xl font-black text-lg bg-slate-700 text-slate-500 cursor-not-allowed uppercase tracking-widest mt-4 shadow-2xl transition-all">
+                Submit Findings
             </button>
         </div>
     </div>
 
-    <!-- Phase 4: Result -->
-    <div id="phase-result" class="phase-hidden w-full max-w-4xl mt-4 mx-auto flex-col">
-        <div id="result-card" class="p-16 rounded-[60px] border shadow-2xl relative overflow-hidden">
-            <div class="flex items-center gap-10 mb-12">
-                <div id="result-icon-container" class="p-8 rounded-[32px] shadow-2xl scale-125"></div>
-                <div>
-                    <h2 id="result-title" class="text-7xl font-black uppercase tracking-tighter"></h2>
-                    <p class="text-slate-400 font-bold uppercase tracking-[0.4em] text-sm mt-3 opacity-60">Field Performance Review</p>
+    <!-- Phase 4: Resolution -->
+    <div id="phase-result" class="phase-hidden w-full max-w-xl mt-4 mx-auto flex-col">
+        <div id="result-card" class="p-10 rounded-[40px] border shadow-2xl bg-slate-800">
+            <div class="flex items-center gap-6 mb-8">
+                <div id="result-icon-container" class="p-5 rounded-3xl shadow-xl"></div>
+                <div><h2 id="result-title" class="text-4xl font-black uppercase tracking-tighter text-white"></h2><p class="text-slate-400 text-[10px] uppercase font-bold tracking-widest">Performance Review</p></div>
+            </div>
+            <div class="space-y-5">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700"><p class="text-[9px] text-slate-500 uppercase font-black mb-1">Your Audit</p><p id="audit-driver" class="text-white font-bold"></p></div>
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-blue-500/20"><p class="text-[9px] text-blue-400 uppercase font-black mb-1">Expert Protocol</p><p id="correct-driver" class="text-white font-bold"></p></div>
+                </div>
+                <div class="bg-slate-700/30 p-6 rounded-2xl border border-slate-600 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
+                    <h4 class="text-blue-400 font-black text-[10px] uppercase tracking-widest mb-3 flex items-center gap-2"><i data-lucide="heart" class="w-4 h-4"></i> Trainer Debrief</h4>
+                    <p id="debrief-text" class="text-slate-200 text-sm leading-relaxed"></p>
                 </div>
             </div>
-            
-            <div class="grid md:grid-cols-2 gap-8 mb-12">
-                <div class="bg-slate-950/40 p-8 rounded-[32px] border border-white/5">
-                    <p class="text-[11px] text-slate-500 uppercase font-black tracking-[0.2em] mb-3">Your Audit</p>
-                    <p id="audit-driver" class="text-2xl font-bold text-white"></p>
-                </div>
-                <div class="bg-slate-950/40 p-8 rounded-[32px] border border-blue-500/20">
-                    <p class="text-[11px] text-blue-400 uppercase font-black tracking-[0.2em] mb-3">Correct Protocol</p>
-                    <p id="correct-driver" class="text-2xl font-bold text-white"></p>
-                </div>
-            </div>
-
-            <div class="bg-white/5 backdrop-blur-xl p-10 rounded-[40px] border border-white/10 relative overflow-hidden mb-12">
-                <div class="absolute top-0 left-0 w-3 h-full bg-blue-500"></div>
-                <h4 class="text-blue-400 font-black text-xs uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
-                    <i data-lucide="heart" class="w-6 h-6"></i> Trainer Feedback
-                </h4>
-                <p id="debrief-text" class="text-2xl text-slate-200 leading-relaxed font-light"></p>
-            </div>
-            
-            <button onclick="resetGame()" class="w-full bg-slate-100 hover:bg-white text-slate-900 font-black py-6 rounded-3xl text-xl transition-all uppercase tracking-[0.2em] shadow-2xl transform active:scale-95">Restart Assignment</button>
+            <button onclick="resetGame()" class="mt-8 w-full bg-slate-100 hover:bg-white text-slate-900 font-black py-5 rounded-2xl text-md transition-all uppercase tracking-widest shadow-xl transform active:scale-95">Restart Shift</button>
         </div>
     </div>
 
     <script>
+        // --- ASSET PATH LOGIC ---
+        const getAssetPath = (fileName) => {
+            const loc = window.location.pathname;
+            // Clean up directory if it's the root or ends in .html
+            let dir = loc.substring(0, loc.lastIndexOf('/'));
+            if (dir === "") dir = "";
+            return window.location.origin + dir + "/" + fileName + "?v=" + new Date().getTime();
+        };
+
+        const avatarUrl = getAssetPath('patience-avatar.jpeg');
+        const boardUrl = getAssetPath('clinic-board.jpeg');
+        
         const START_POSITION = '2-8';
         const pathSpaces = [
             '2-8', '2-7', '3-7', '4-7', '4-6', '3-6', '2-6', '2-5', '3-5', '4-5', 
@@ -249,11 +242,11 @@
 
         const caseFile = {
             evidence: [
-                { id: 'ev1', boardPos: '2-5', icon: "user", content: "I've been a patient here for 30 years! I shouldn't have to fill in a form like a child!" },
+                { id: 'ev1', boardPos: '2-5', icon: "user", content: "I've been a patient here for 30 years! I shouldn't have to fill in a digital form like a child!" },
                 { id: 'ev2', boardPos: '9-7', icon: "alert-triangle", content: "Receptionist replied: Everyone has to fill in the form. Those are the rules." },
-                { id: 'ev3', boardPos: '9-4', icon: "info", content: "Patient recently had a heart scare and is struggling with digital triage." },
+                { id: 'ev3', boardPos: '9-4', icon: "info", content: "Patient recently had a heart scare and is struggling with the new digital triage." },
                 { id: 'ev4', boardPos: '6-6', icon: "alert-octagon", content: "Staff Gossip: He's always looking for an excuse to shout. He likes the attention." },
-                { id: 'ev5', boardPos: '6-3', icon: "file-text", content: "Note on Desk: Just tell difficult patients NO and don't budge." }
+                { id: 'ev5', boardPos: '6-3', icon: "file-text", content: "Note on Desk: Just tell difficult patients NO and don't budge. They have to learn." }
             ],
             correct: {
                 driver: "Fear/Losing Control",
@@ -268,18 +261,25 @@
         let state = { phase: 'briefing', position: START_POSITION, cluesFound: [], movesLeft: 0, diceRoll: null, isRolling: false, isMoving: false, displayEvidence: [], reachableTiles: new Set() };
 
         document.addEventListener('DOMContentLoaded', () => {
-            const dS = document.getElementById('select-driver');
-            if (dS) driversList.forEach(d => { const o = document.createElement('option'); o.value = d; o.innerText = d; dS.appendChild(o); });
-            const tS = document.getElementById('select-tool');
-            if (tS) toolsList.forEach(t => { const o = document.createElement('option'); o.value = t; o.innerText = t; tS.appendChild(o); });
+            // Apply absolute paths
+            const board = document.getElementById('board-container');
+            if (board) board.style.backgroundImage = `url('${boardUrl}')`;
+            
+            const avatar = document.getElementById('briefing-avatar');
+            if (avatar) avatar.src = avatarUrl;
+
+            const dSelect = document.getElementById('select-driver');
+            if (dSelect) driversList.forEach(d => { const o = document.createElement('option'); o.value = d; o.innerText = d; dSelect.appendChild(o); });
+            const tSelect = document.getElementById('select-tool');
+            if (tSelect) toolsList.forEach(t => { const o = document.createElement('option'); o.value = t; o.innerText = t; tSelect.appendChild(o); });
+            
             lucide.createIcons();
         });
 
         function setPhase(newPhase) {
             state.phase = newPhase;
-            const statusEl = document.getElementById('status-text');
-            if (statusEl) statusEl.innerText = `PHASE: ${newPhase.toUpperCase()}`;
-            
+            const sText = document.getElementById('status-text');
+            if (sText) sText.innerText = `PHASE: ${newPhase.toUpperCase()}`;
             ['briefing', 'playing', 'deduction', 'result'].forEach(p => {
                 const el = document.getElementById(`phase-${p}`);
                 if (el) {
@@ -288,15 +288,14 @@
                 }
             });
             if (newPhase === 'deduction') {
-                const cEl = document.getElementById('deduction-clue-count');
-                if (cEl) cEl.innerText = `FIELD LOG: ${state.cluesFound.length} OBJECTIVE FINDINGS SECURED.`;
+                const dc = document.getElementById('deduction-clue-count');
+                if (dc) dc.innerText = `${state.cluesFound.length} findings logged. Identify the driver.`;
             }
         }
 
         function startGame() { 
             state.displayEvidence = [...caseFile.evidence].sort(() => Math.random() - 0.5); 
-            setPhase('playing'); 
-            updateUI(); 
+            setPhase('playing'); updateUI(); 
         }
 
         function rollDice() {
@@ -359,14 +358,13 @@
         function updateUI() {
             const ctrl = document.getElementById('dice-controls');
             if (!ctrl) return;
-
             if (state.movesLeft <= 0) {
-                ctrl.innerHTML = `<button onclick="rollDice()" ${state.isRolling || state.isMoving ? 'disabled opacity-50' : ''} class="bg-blue-600 hover:bg-blue-500 text-white font-black py-4 px-10 rounded-2xl flex items-center gap-4 shadow-2xl transition-all hover:-translate-y-1 active:scale-95 border-b-4 border-blue-800">
-                    <i data-lucide="dice-5" class="w-6 h-6 ${state.isRolling ? 'animate-spin' : ''}"></i><span class="text-sm uppercase tracking-widest">${state.isRolling ? 'Rolling...' : 'Roll Dice'}</span></button>`;
+                ctrl.innerHTML = `<button onclick="rollDice()" ${state.isRolling || state.isMoving ? 'disabled opacity-50' : ''} class="bg-blue-600 text-white font-black py-2.5 px-6 rounded-xl flex items-center gap-2 shadow-md transform active:scale-95 transition-all">
+                    <i data-lucide="dices" class="w-4 h-4 ${state.isRolling ? 'animate-spin' : ''}"></i><span class="text-[11px] uppercase tracking-tighter">${state.isRolling ? '...' : 'Roll Dice'}</span></button>`;
             } else {
-                ctrl.innerHTML = `<div class="flex items-center gap-5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-8 py-3 rounded-2xl font-black">
-                    <div class="flex items-center justify-center bg-emerald-500 text-slate-900 w-10 h-10 rounded-xl text-xl font-black shadow-lg">${state.diceRoll}</div>
-                    <i data-lucide="footprints" class="w-6 h-6 animate-pulse"></i><span class="text-sm uppercase tracking-widest">${state.isMoving ? 'Moving' : `${state.movesLeft} Moves`}</span></div>`;
+                ctrl.innerHTML = `<div class="flex items-center gap-2 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 px-3 py-1.5 rounded-xl font-bold">
+                    <div class="flex items-center justify-center bg-emerald-500 text-slate-900 w-5 h-5 rounded text-[10px] font-black">${state.diceRoll}</div>
+                    <i data-lucide="footprints" class="w-3 h-3 animate-pulse"></i><span class="text-[9px] uppercase tracking-tight">${state.isMoving ? 'Moving' : `${state.movesLeft} Left`}</span></div>`;
             }
 
             const grid = document.getElementById('grid-container');
@@ -380,18 +378,18 @@
                     const found = clue && state.cluesFound.includes(clue.id);
                     const cur = state.position === id, reach = state.reachableTiles.has(id), blue = idx % 2 === 0;
                     
-                    let cls = `relative rounded-xl border flex items-center justify-center transition-all game-tile `;
-                    if (cur) cls += "ring-4 ring-amber-400 z-30 shadow-[0_0_50px_rgba(245,158,11,0.5)] bg-white/20 scale-105 ";
-                    else if (reach) cls += "cursor-pointer hover:bg-emerald-500/30 ring-2 ring-emerald-400/40 z-20 hover:scale-105 ";
+                    let cls = `relative rounded border border-slate-800/20 flex items-center justify-center transition-all game-tile `;
+                    if (cur) cls += "ring-2 ring-amber-400 z-30 shadow-lg ";
+                    else if (reach) cls += "cursor-pointer hover:bg-emerald-500/30 ring-2 ring-emerald-400/40 z-20 ";
                     
-                    cls += blue ? "bg-[#2563eb]/20 border-[#2563eb]/20 " : "bg-white/10 border-white/10 ";
-                    if (found) cls += "opacity-5 grayscale ";
+                    cls += blue ? "bg-[#2563eb]/40 " : "bg-white/40 ";
+                    if (found) cls += "opacity-10 grayscale ";
                     
                     let inner = '';
-                    if (clue && !found) inner += `<i data-lucide="search" class="w-6 h-6 ${blue?'text-white/60':'text-slate-400/60'}"></i>`;
+                    if (clue && !found) inner += `<i data-lucide="search" class="w-3 h-3 ${blue?'text-white/40':'text-slate-400/40'}"></i>`;
                     if (cur) {
-                        inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none p-2"><div class="w-full h-full rounded-full border-2 border-white shadow-2xl overflow-hidden ring-8 ring-blue-500/10">
-                            <div class="avatar-frame"></div></div></div>`;
+                        inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none p-1"><div class="w-full h-full rounded-full border-2 border-white shadow-xl overflow-hidden">
+                            <img src="${avatarUrl}" class="w-full h-full object-cover"></div></div>`;
                     }
                     h += `<div onclick="handleTileClick('${id}')" class="${cls}">${inner}</div>`;
                 }
@@ -402,12 +400,12 @@
             const cDisp = document.getElementById('evidence-count');
             if (cDisp) cDisp.innerText = state.cluesFound.length;
             if (list) {
-                if (state.cluesFound.length === 0) { list.innerHTML = `<div class="flex flex-col items-center justify-center h-48 opacity-30 italic"><i data-lucide="database" class="w-8 h-8 mb-4"></i><p class="text-xs uppercase tracking-widest">Awaiting field data...</p></div>`; }
+                if (state.cluesFound.length === 0) { list.innerHTML = `<p class="text-center text-slate-500 text-[9px] mt-4 uppercase font-bold tracking-widest text-nowrap">Gathering Field Data...</p>`; }
                 else {
                     let listHtml = '';
                     state.displayEvidence.forEach(ev => {
                         const found = state.cluesFound.includes(ev.id);
-                        listHtml += found ? `<div class="p-5 rounded-3xl border bg-slate-950/80 border-blue-500/30 shadow-xl animate-in fade-in slide-in-from-right-4 duration-500"><div class="flex items-center gap-3 mb-3 text-blue-400 font-black text-[10px] uppercase tracking-widest"><div class="p-1.5 bg-blue-500/20 rounded-lg"><i data-lucide="${ev.icon}" class="w-4 h-4"></i></div>Secured Findings</div><p class="text-sm text-slate-100 leading-relaxed font-light">"${ev.content}"</p></div>` : `<div class="p-5 rounded-3xl border border-dashed border-slate-700/50 opacity-10 flex justify-center py-6"><i data-lucide="lock" class="w-6 h-6 text-slate-500"></i></div>`;
+                        listHtml += found ? `<div class="p-3 rounded-xl border bg-slate-900 border-slate-600 shadow-sm animate-in fade-in"><div class="flex items-center gap-1.5 mb-1 text-blue-400 font-bold text-[8px] uppercase tracking-widest"><i data-lucide="${ev.icon}" class="w-3 h-3"></i>Field Discovery</div><p class="text-[10px] text-slate-200 leading-tight">"${ev.content}"</p></div>` : `<div class="p-3 rounded-xl border border-dashed border-slate-700 opacity-10 flex justify-center py-4"><i data-lucide="lock" class="w-3 h-3 text-slate-500"></i></div>`;
                     });
                     list.innerHTML = listHtml;
                 }
@@ -416,28 +414,31 @@
         }
 
         function checkDeductionValid() {
-            const dV = document.getElementById('select-driver').value, tV = document.getElementById('select-tool').value;
+            const ds = document.getElementById('select-driver'), ts = document.getElementById('select-tool');
+            if (!ds || !ts) return;
             const btn = document.getElementById('btn-submit-deduction');
             if (btn) {
-                if (dV && tV) { btn.disabled = false; btn.className = "w-full py-6 rounded-2xl font-black text-xl bg-emerald-600 text-white cursor-pointer uppercase tracking-widest shadow-2xl transition-all hover:-translate-y-1"; }
-                else { btn.disabled = true; btn.className = "w-full py-6 rounded-2xl font-black text-xl bg-slate-800 text-slate-500 cursor-not-allowed uppercase tracking-widest"; }
+                if (ds.value && ts.value) { btn.disabled = false; btn.className = "w-full py-4 rounded-xl font-black text-sm bg-emerald-600 text-white cursor-pointer uppercase tracking-widest transition-all"; }
+                else { btn.disabled = true; btn.className = "w-full py-4 rounded-xl font-black text-sm bg-slate-700 text-slate-500 cursor-not-allowed uppercase tracking-widest"; }
             }
         }
 
         function submitDeduction() {
-            const d = document.getElementById('select-driver').value, t = document.getElementById('select-tool').value, correct = (d === caseFile.correct.driver && t === caseFile.correct.tool);
+            const ds = document.getElementById('select-driver'), ts = document.getElementById('select-tool');
+            if (!ds || !ts) return;
+            const correct = (ds.value === caseFile.correct.driver && ts.value === caseFile.correct.tool);
             const card = document.getElementById('result-card'), icon = document.getElementById('result-icon-container'), title = document.getElementById('result-title');
             if (correct) { 
-                card.className = "p-16 rounded-[60px] border-4 border-emerald-500 bg-slate-900/90 shadow-[0_0_100px_rgba(16,185,129,0.2)]"; 
-                icon.className = "bg-emerald-500 p-6 rounded-[32px] shadow-2xl"; icon.innerHTML = `<i data-lucide="check-check" class="w-12 h-12 text-white"></i>`; 
-                if (title) { title.innerText = "CASE SOLVED"; title.className = "text-7xl font-black uppercase tracking-tighter text-emerald-400"; }
+                card.className = "p-8 rounded-[40px] border-4 border-emerald-500 bg-emerald-900/10 shadow-2xl"; 
+                icon.className = "bg-emerald-500 p-3 rounded-2xl"; icon.innerHTML = `<i data-lucide="check" class="w-6 h-6 text-white"></i>`; 
+                if (title) title.innerText = "SOLVED"; 
             } else { 
-                card.className = "p-16 rounded-[60px] border-4 border-rose-500 bg-slate-900/90 shadow-[0_0_100px_rgba(244,63,94,0.2)]"; 
-                icon.className = "bg-rose-500 p-6 rounded-[32px] shadow-2xl"; icon.innerHTML = `<i data-lucide="alert-octagon" class="w-12 h-12 text-white"></i>`; 
-                if (title) { title.innerText = "FAILED"; title.className = "text-7xl font-black uppercase tracking-tighter text-rose-400"; }
+                card.className = "p-8 rounded-[40px] border-4 border-rose-500 bg-rose-900/10 shadow-2xl"; 
+                icon.className = "bg-rose-500 p-3 rounded-2xl"; icon.innerHTML = `<i data-lucide="x" class="w-6 h-6 text-white"></i>`; 
+                if (title) title.innerText = "FAILED"; 
             }
-            const aD = document.getElementById('audit-driver'), cD = document.getElementById('correct-driver'), dBT = document.getElementById('debrief-text');
-            if (aD) aD.innerText = d; if (cD) cD.innerText = caseFile.correct.driver; if (dBT) dBT.innerText = caseFile.correct.reason;
+            const ad = document.getElementById('audit-driver'), cd = document.getElementById('correct-driver'), dbt = document.getElementById('debrief-text');
+            if (ad) ad.innerText = ds.value; if (cd) cd.innerText = caseFile.correct.driver; if (dbt) dbt.innerText = caseFile.correct.reason;
             setPhase('result'); lucide.createIcons();
         }
 
