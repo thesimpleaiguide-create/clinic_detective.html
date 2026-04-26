@@ -27,7 +27,7 @@
             aspect-ratio: 16 / 9; 
             margin: 0 auto;
             position: relative;
-            background-color: #eaddc5; /* 80s paper fallback */
+            background-color: #eaddc5;
             border-radius: 24px;
             border: 6px solid #1e293b;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
@@ -42,6 +42,7 @@
             top: 0;
             left: 0;
             z-index: 0;
+            display: block;
         }
         
         #grid-container {
@@ -54,16 +55,25 @@
             padding: 8px;
         }
 
+        /* Fixed Avatar Styling - Centers the face and prevents head-cropping */
         .avatar-main {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center 15%; /* Shifts focus slightly up to keep the head in view */
             border-radius: 50%;
             background-color: #1e293b;
+            transform: scale(1.05); /* Slight scale to fill circle edges better */
         }
 
         .game-tile {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* High Visibility Clue Markers */
+        .clue-marker {
+            filter: drop-shadow(0 0 4px rgba(0,0,0,0.5));
+            opacity: 0.9;
         }
 
         .glass-panel {
@@ -108,7 +118,7 @@
             <div class="space-y-8">
                 <div class="flex items-center gap-4 text-emerald-400">
                     <i data-lucide="file-text" class="w-10 h-10"></i>
-                    <h2 class="text-4xl font-black uppercase tracking-tight">Active Case File</h2>
+                    <h2 class="text-4xl font-black uppercase tracking-tight">New Assignment</h2>
                 </div>
                 
                 <div class="bg-slate-950/80 p-8 rounded-3xl border-l-[12px] border-emerald-500 shadow-inner">
@@ -342,7 +352,7 @@
             const ctrl = document.getElementById('dice-controls');
             if (!ctrl) return;
             if (state.movesLeft <= 0) {
-                ctrl.innerHTML = `<button onclick="rollDice()" ${state.isRolling || state.isMoving ? 'disabled opacity-50' : ''} class="bg-blue-600 text-white font-black py-4 px-10 rounded-2xl flex items-center gap-4 shadow-md transform active:scale-95 transition-all">
+                ctrl.innerHTML = `<button onclick="rollDice()" ${state.isRolling || state.isMoving ? 'disabled opacity-50' : ''} class="bg-blue-600 text-white font-black py-4 px-10 rounded-2xl flex items-center gap-4 shadow-2xl transition-all hover:-translate-y-1 active:scale-95 border-b-4 border-blue-800">
                     <i data-lucide="dice-5" class="w-7 h-7 ${state.isRolling ? 'animate-spin' : ''}"></i><span class="text-sm uppercase tracking-widest">${state.isRolling ? 'Rolling...' : 'Roll Dice'}</span></button>`;
             } else {
                 ctrl.innerHTML = `<div class="flex items-center gap-5 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 px-8 py-3 rounded-2xl font-black">
@@ -365,12 +375,16 @@
                     if (cur) cls += "ring-4 ring-amber-400 z-30 shadow-[0_0_50px_rgba(245,158,11,0.5)] bg-white/20 scale-105 ";
                     else if (reach) cls += "cursor-pointer hover:bg-emerald-500/30 ring-2 ring-emerald-400/30 z-20 hover:scale-105 ";
                     
-                    // High transparency (15%) to let board artwork shine through
                     cls += blue ? "bg-[#2563eb]/15 " : "bg-white/15 ";
                     if (found) cls += "opacity-5 grayscale ";
                     
                     let inner = '';
-                    if (clue && !found) inner += `<i data-lucide="search" class="w-6 h-6 ${blue?'text-white/40':'text-slate-400/40'}"></i>`;
+                    if (clue && !found) {
+                        // Enhanced visibility for the magnifying glass
+                        inner += `<div class="bg-black/20 rounded-full p-2 flex items-center justify-center clue-marker">
+                                    <i data-lucide="search" class="w-7 h-7 text-white drop-shadow-md"></i>
+                                  </div>`;
+                    }
                     if (cur) {
                         inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none p-2"><div class="w-full h-full rounded-full border-2 border-white shadow-2xl overflow-hidden ring-8 ring-blue-500/10">
                             <img src="${avatarUrl}" class="avatar-main"></div></div>`;
@@ -389,7 +403,7 @@
                     let listHtml = '';
                     state.displayEvidence.forEach(ev => {
                         const found = state.cluesFound.includes(ev.id);
-                        listHtml += found ? `<div class="p-5 rounded-3xl border bg-slate-900/80 border-blue-500/30 shadow-xl animate-in fade-in slide-in-from-right-4 duration-500"><div class="flex items-center gap-3 mb-3 text-blue-400 font-bold text-[9px] uppercase tracking-widest"><i data-lucide="${ev.icon}" class="w-4 h-4"></i>Secured Findings</div><p class="text-sm text-slate-200 leading-relaxed font-light italic">"${ev.content}"</p></div>` : `<div class="p-5 rounded-3xl border border-dashed border-slate-700/50 opacity-10 flex justify-center py-8"><i data-lucide="lock" class="w-6 h-6 text-slate-500"></i></div>`;
+                        listHtml += found ? `<div class="p-5 rounded-3xl border bg-slate-900/80 border-blue-500/30 shadow-xl animate-in fade-in slide-in-from-right-4 duration-500"><div class="flex items-center gap-3 mb-3 text-blue-400 font-bold text-[9px] uppercase tracking-widest"><i data-lucide="${ev.icon}" class="w-4 h-4"></i>Secured Findings</div><p class="text-sm text-slate-100 leading-relaxed font-light italic">"${ev.content}"</p></div>` : `<div class="p-5 rounded-3xl border border-dashed border-slate-700/50 opacity-10 flex justify-center py-8"><i data-lucide="lock" class="w-6 h-6 text-slate-500"></i></div>`;
                     });
                     list.innerHTML = listHtml;
                 }
