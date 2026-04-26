@@ -32,12 +32,13 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 16:9 Widescreen Board - Fixed for Mindsmith Embeds */
+        /* 16:9 Widescreen Board - Hardcoded for absolute resilience */
         #board-container {
             max-height: 60vh; 
             width: 100%;
             aspect-ratio: 16 / 9; 
             margin: 0 auto;
+            background-image: url('https://thesimpleaiguide-create.github.io/clinic-board.jpeg');
             background-size: 100% 100%; 
             background-repeat: no-repeat;
             background-position: center;
@@ -62,6 +63,7 @@
             height: 100%;
             object-fit: cover;
             border-radius: 50%;
+            background-color: #1e293b;
         }
 
         /* Ghost Tiles - subtle until needed */
@@ -112,7 +114,7 @@
 
             <!-- Clean Avatar Display -->
             <div class="w-40 h-40 rounded-full border-4 border-emerald-500/30 p-1 shadow-2xl bg-slate-900 flex-shrink-0 overflow-hidden">
-                <img id="briefing-avatar" src="patience-avatar.jpeg" alt="Patience Waites" class="avatar-circle" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Patience'">
+                <img id="briefing-avatar" src="https://thesimpleaiguide-create.github.io/patience-avatar.jpeg" alt="Patience Waites" class="avatar-circle">
             </div>
         </div>
     </div>
@@ -193,17 +195,9 @@
     </div>
 
     <script>
-        // --- SMART URL DISCOVERY ---
-        const getAssetURL = (fileName) => {
-            const loc = window.location;
-            const path = loc.pathname;
-            const dir = path.substring(0, path.lastIndexOf('/'));
-            const cleanDir = dir.endsWith('.html') ? dir.substring(0, dir.lastIndexOf('/')) : dir;
-            return `${loc.origin}${cleanDir}/${fileName}?v=${new Date().getTime()}`;
-        };
-
-        const avatarUrl = getAssetURL('patience-avatar.jpeg');
-        const boardUrl = getAssetURL('clinic-board.jpeg');
+        // --- ABSOLUTE URLS FORCED ---
+        const avatarUrl = 'https://thesimpleaiguide-create.github.io/patience-avatar.jpeg';
+        const boardUrl = 'https://thesimpleaiguide-create.github.io/clinic-board.jpeg';
         
         const START_POSITION = '2-8';
         const pathSpaces = [
@@ -234,20 +228,10 @@
         let state = { phase: 'briefing', position: START_POSITION, cluesFound: [], movesLeft: 0, diceRoll: null, isRolling: false, isMoving: false, displayEvidence: [], reachableTiles: new Set() };
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Force board background
-            const board = document.getElementById('board-container');
-            if (board) board.style.backgroundImage = `url('${boardUrl}')`;
-            
-            // Force avatar
-            const avatar = document.getElementById('briefing-avatar');
-            if (avatar) avatar.src = avatarUrl;
-
             const dSelect = document.getElementById('select-driver');
             if (dSelect) driversList.forEach(d => { const o = document.createElement('option'); o.value = d; o.innerText = d; dSelect.appendChild(o); });
-            
             const tSelect = document.getElementById('select-tool');
             if (tSelect) toolsList.forEach(t => { const o = document.createElement('option'); o.value = t; o.innerText = t; tSelect.appendChild(o); });
-            
             lucide.createIcons();
         });
 
@@ -340,7 +324,7 @@
                 ctrl.innerHTML = `<button onclick="rollDice()" ${state.isRolling || state.isMoving ? 'disabled opacity-50' : ''} class="bg-blue-600 text-white font-black py-2 px-5 rounded-xl flex items-center gap-2 shadow-md transform active:scale-95 transition-all">
                     <i data-lucide="dices" class="w-4 h-4 ${state.isRolling ? 'animate-spin' : ''}"></i><span class="text-[11px] uppercase tracking-tighter">${state.isRolling ? '...' : 'Roll Dice'}</span></button>`;
             } else {
-                ctrl.innerHTML = `<div class="flex items-center gap-3 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 px-3 py-1.5 rounded-xl font-bold">
+                ctrl.innerHTML = `<div class="flex items-center gap-2 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 px-3 py-1.5 rounded-xl font-bold">
                     <div class="flex items-center justify-center bg-emerald-500 text-slate-900 w-5 h-5 rounded text-[10px] font-black">${state.diceRoll}</div>
                     <i data-lucide="footprints" class="w-3 h-3 animate-pulse"></i><span class="text-[10px] uppercase font-black tracking-tight">${state.isMoving ? 'Moving' : `${state.movesLeft} Left`}</span></div>`;
             }
@@ -367,7 +351,7 @@
                     if (clue && !found) inner += `<i data-lucide="search" class="w-3 h-3 ${blue?'text-white/40':'text-slate-400/40'}"></i>`;
                     if (cur) {
                         inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none p-1"><div class="w-full h-full rounded-full border-2 border-white shadow-xl overflow-hidden">
-                            <img src="${avatarUrl}" class="w-full h-full object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Patience'"></div></div>`;
+                            <img src="${avatarUrl}" class="w-full h-full object-cover"></div></div>`;
                     }
                     h += `<div onclick="handleTileClick('${id}')" class="${cls}">${inner}</div>`;
                 }
