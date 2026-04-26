@@ -20,12 +20,14 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 16:9 Widescreen Board Logic */
+        /* 16:9 Widescreen Board Logic - Resilient to Embeds */
         #board-container {
             max-height: 55vh; 
             width: 100%;
-            aspect-ratio: 16 / 9; /* Updated to 16:9 to match your new image */
+            aspect-ratio: 16 / 9; 
             margin: 0 auto;
+            /* HARDCODED BACKGROUND FOR MINDSMITH RESILIENCE */
+            background-image: url('https://thesimpleaiguide-create.github.io/clinic-board.jpeg');
             background-size: 100% 100%; 
             background-repeat: no-repeat;
             background-position: center;
@@ -33,7 +35,8 @@
             background-color: #eaddc5;
             position: relative;
             border: 4px solid #1e293b;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
         }
         
         #grid-container {
@@ -42,7 +45,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            padding: 4px;
+            padding: 2px;
         }
 
         body {
@@ -50,23 +53,24 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            background-color: #0f172a;
         }
         
-        .avatar-img {
+        /* Resilient Avatar Styling */
+        .avatar-circle {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-        }
-        
-        /* Low opacity tiles to see the board clearly */
-        .game-tile {
-            transition: all 0.2s ease;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* HARDCODED AVATAR URL */
+            background-image: url('https://thesimpleaiguide-create.github.io/patience-avatar.jpeg');
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 p-1 md:p-2 font-sans items-center">
+<body class="text-slate-100 p-1 md:p-2 font-sans items-center">
 
-    <!-- Slim Header -->
+    <!-- Header -->
     <header class="w-full max-w-6xl mb-1 border-b border-slate-700 pb-1 flex justify-between items-center px-2">
         <div>
             <h1 class="text-lg font-bold tracking-tight text-blue-400 leading-none uppercase">Clinic Detective</h1>
@@ -82,10 +86,9 @@
                 <i data-lucide="file-text" class="w-6 h-6"></i>
                 <h2 class="text-xl font-bold uppercase tracking-tight">New Assignment</h2>
             </div>
-            <!-- Character Avatar Fixed -->
-            <div class="w-16 h-16 rounded-full border-2 border-emerald-500 overflow-hidden bg-slate-700 shadow-lg ring-4 ring-emerald-500/10 flex items-center justify-center">
-                <img id="briefing-avatar" src="" alt="" class="avatar-img" onerror="this.style.display='none'">
-                <i data-lucide="user" class="w-8 h-8 text-emerald-400" id="briefing-icon" style="display:none"></i>
+            <!-- Character Avatar Div (More robust than <img> tag for broken links) -->
+            <div class="w-16 h-16 rounded-full border-2 border-emerald-500 overflow-hidden bg-slate-700 shadow-lg ring-4 ring-emerald-500/10">
+                <div class="avatar-circle"></div>
             </div>
         </div>
         
@@ -94,16 +97,16 @@
                 <p class="font-mono text-[9px] text-emerald-500 mb-1 uppercase tracking-widest font-bold">Incident Report:</p>
                 <p class="italic text-slate-200">"Mr. Henderson is shouting at reception, demanding an immediate GP callback for a routine prescription query."</p>
             </div>
-            <p class="leading-relaxed">Roll the dice to navigate the clinic and uncover evidence. Beware of <strong>Red Herrings</strong>—gossip and bad advice that complicate the investigation.</p>
+            <p class="leading-relaxed text-slate-400">Investigate the floor to gather clues. You must decide which findings are valid evidence and which are simply <strong>Red Herrings</strong>.</p>
             <button onclick="startGame()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 text-md shadow-lg transform active:scale-95">
-                Enter the Clinic <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                Start Shift <i data-lucide="chevron-right" class="w-4 h-4"></i>
             </button>
         </div>
     </div>
 
     <!-- Phase 2: Playing -->
     <div id="phase-playing" class="phase-hidden w-full max-w-6xl flex flex-col lg:flex-row gap-2 h-[calc(100vh-80px)] mx-auto">
-        <!-- Board & Controls -->
+        <!-- Board -->
         <div class="flex-1 flex flex-col gap-2 overflow-hidden">
             <div id="board-container">
                 <div id="grid-container" class="grid grid-cols-10 grid-rows-8 gap-0.5 z-10"></div>
@@ -119,7 +122,7 @@
             </div>
         </div>
 
-        <!-- Evidence Inventory -->
+        <!-- Evidence Log -->
         <div class="w-full lg:w-[260px] flex flex-col h-full overflow-hidden">
             <div class="bg-slate-800 rounded-lg p-3 border border-slate-700 flex-1 flex flex-col overflow-hidden shadow-md">
                 <div class="flex justify-between items-center mb-2 pb-1 border-b border-slate-700">
@@ -135,9 +138,7 @@
 
     <!-- Phase 3: Deduction -->
     <div id="phase-deduction" class="phase-hidden w-full max-w-md bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-2xl mt-2 mx-auto">
-        <h2 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2 uppercase">
-            <i data-lucide="shield-alert" class="w-4 h-4"></i> Case Deduction
-        </h2>
+        <h2 class="text-lg font-bold text-amber-400 mb-3 flex items-center gap-2 uppercase text-center">Case Deduction</h2>
         <div id="deduction-clue-count" class="bg-slate-900/50 p-2 rounded border border-slate-700 mb-4 text-[11px] text-slate-300 italic text-center"></div>
         <div class="space-y-3">
             <div>
@@ -145,11 +146,11 @@
                 <select id="select-driver" onchange="checkDeductionValid()" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-xs text-slate-200 outline-none"></select>
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-tighter">Response Technique:</label>
+                <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-tighter">Technique:</label>
                 <select id="select-tool" onchange="checkDeductionValid()" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-xs text-slate-200 outline-none"></select>
             </div>
             <button id="btn-submit-deduction" disabled onclick="submitDeduction()" class="w-full py-2.5 rounded font-bold text-sm bg-slate-700 text-slate-500 cursor-not-allowed uppercase tracking-wider">
-                Submit Investigation
+                Submit Findings
             </button>
         </div>
     </div>
@@ -177,12 +178,11 @@
     </div>
 
     <script>
-        // --- Bulletproof Assets ---
-        const baseUrl = "https://thesimpleaiguide-create.github.io/";
-        const patienceAvatarUrl = baseUrl + "patience-avatar.jpeg"; 
-        const boardImageUrl = baseUrl + "clinic-board.jpeg";
+        // --- ABSOLUTE URLS FOR MAX IFRAME COMPATIBILITY ---
+        const patienceAvatarUrl = 'https://thesimpleaiguide-create.github.io/patience-avatar.jpeg';
+        const boardImageUrl = 'https://thesimpleaiguide-create.github.io/clinic-board.jpeg';
+        
         const START_POSITION = '2-8';
-
         const pathSpaces = [
             '2-8', '2-7', '3-7', '4-7', '4-6', '3-6', '2-6', '2-5', '3-5', '4-5', 
             '4-4', '5-4', '5-3', '6-3', '7-3', '7-4', '8-4', '8-5', '7-5', '6-5', 
@@ -192,11 +192,11 @@
 
         const caseFile = {
             evidence: [
-                { id: 'ev1', boardPos: '2-5', icon: "user", content: "\"I've been a patient here for 30 years! I shouldn't have to fill in a digital form like a child!\"" },
-                { id: 'ev2', boardPos: '9-7', icon: "alert-triangle", content: "Receptionist replied: \"Everyone has to fill in the form, Mr. Henderson. Those are the rules.\"" },
-                { id: 'ev3', boardPos: '9-4', icon: "info", content: "Mr. Henderson recently had a heart scare and has struggled with the new online triage system." },
-                { id: 'ev4', boardPos: '6-6', icon: "alert-octagon", content: "Another patient whispered: 'He's always looking for an excuse to shout at people. He just likes the attention.'" },
-                { id: 'ev5', boardPos: '6-3', icon: "file-text", content: "Sticky note on desk: 'Just tell difficult patients NO and don't budge. They have to learn.'" }
+                { id: 'ev1', boardPos: '2-5', icon: "user", content: "\"I've been a patient here for 30 years! I shouldn't have to fill in a digital form!\"" },
+                { id: 'ev2', boardPos: '9-7', icon: "alert-triangle", content: "Receptionist replied: \"Everyone has to fill in the form. Those are the rules.\"" },
+                { id: 'ev3', boardPos: '9-4', icon: "info", content: "Mr. Henderson recently had a heart scare and has struggled with the new digital triage." },
+                { id: 'ev4', boardPos: '6-6', icon: "alert-octagon", content: "Another patient whispered: 'He's always looking for an excuse to shout. He likes attention.'" },
+                { id: 'ev5', boardPos: '6-3', icon: "file-text", content: "Sticky note: 'Just tell difficult patients NO and don't budge. They have to learn.'" }
             ],
             correct: {
                 driver: "Fear/Losing Control",
@@ -208,41 +208,9 @@
         const driversList = ["Fear/Losing Control", "Entitlement", "Shame/Embarrassment", "Past Trauma"];
         const toolsList = ["Miller's Law & Fairness Frame", "The Boundaries Ladder (Rung 4)", "The 4-Part Structure", "Pace Control & Redirect"];
 
-        let state = {
-            phase: 'briefing',
-            position: START_POSITION,
-            cluesFound: [],
-            movesLeft: 0,
-            diceRoll: null,
-            isRolling: false,
-            isMoving: false,
-            displayEvidence: [],
-            reachableTiles: new Set()
-        };
+        let state = { phase: 'briefing', position: START_POSITION, cluesFound: [], movesLeft: 0, diceRoll: null, isRolling: false, isMoving: false, displayEvidence: [], reachableTiles: new Set() };
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Apply Board background
-            const container = document.getElementById('board-container');
-            const bgImg = new Image();
-            bgImg.onload = () => container.style.backgroundImage = `url('${boardImageUrl}')`;
-            bgImg.src = boardImageUrl;
-            
-            // Set briefing avatar
-            const briefingImg = document.getElementById('briefing-avatar');
-            const briefingIcon = document.getElementById('briefing-icon');
-            const avaPreload = new Image();
-            avaPreload.onload = () => {
-                briefingImg.src = patienceAvatarUrl;
-                briefingImg.style.display = 'block';
-                briefingIcon.style.display = 'none';
-            };
-            avaPreload.onerror = () => {
-                briefingImg.style.display = 'none';
-                briefingIcon.style.display = 'block';
-            };
-            avaPreload.src = patienceAvatarUrl;
-
-            // Populate selects
             const dSelect = document.getElementById('select-driver');
             driversList.forEach(d => { const o = document.createElement('option'); o.value = d; o.innerText = d; dSelect.appendChild(o); });
             const tSelect = document.getElementById('select-tool');
@@ -258,21 +226,14 @@
                 if (p === newPhase) { el.classList.remove('phase-hidden'); el.classList.add('phase-active'); }
                 else { el.classList.remove('phase-active'); el.classList.add('phase-hidden'); }
             });
-            if (newPhase === 'deduction') {
-                document.getElementById('deduction-clue-count').innerText = `Collected Evidence: ${state.cluesFound.length} findings.`;
-            }
+            if (newPhase === 'deduction') document.getElementById('deduction-clue-count').innerText = `Collected Evidence: ${state.cluesFound.length} findings.`;
         }
 
-        function startGame() {
-            state.displayEvidence = [...caseFile.evidence].sort(() => Math.random() - 0.5);
-            setPhase('playing');
-            updateUI();
-        }
+        function startGame() { state.displayEvidence = [...caseFile.evidence].sort(() => Math.random() - 0.5); setPhase('playing'); updateUI(); }
 
         function rollDice() {
             if (state.isRolling || state.movesLeft > 0 || state.isMoving) return;
-            state.isRolling = true; state.diceRoll = null;
-            updateUI();
+            state.isRolling = true; state.diceRoll = null; updateUI();
             setTimeout(() => {
                 state.diceRoll = Math.floor(Math.random() * 6) + 1;
                 state.movesLeft = state.diceRoll;
@@ -297,9 +258,7 @@
             while (q.length > 0) {
                 const p = q.shift(), n = p[p.length - 1];
                 if (n === end) return p.slice(1);
-                for (const neighbor of getNeighbors(n)) {
-                    if (!v.has(neighbor)) { v.add(neighbor); q.push([...p, neighbor]); }
-                }
+                for (const neighbor of getNeighbors(n)) { if (!v.has(neighbor)) { v.add(neighbor); q.push([...p, neighbor]); } }
             }
             return [];
         }
@@ -311,19 +270,14 @@
             while (q.length > 0) {
                 const { id, dist } = q.shift();
                 if (dist > 0 && dist <= state.movesLeft) state.reachableTiles.add(id);
-                if (dist < state.movesLeft) {
-                    for (const neighbor of getNeighbors(id)) {
-                        if (!v.has(neighbor)) { v.add(neighbor); q.push({ id: neighbor, dist: dist + 1 }); }
-                    }
-                }
+                if (dist < state.movesLeft) { for (const neighbor of getNeighbors(id)) { if (!v.has(neighbor)) { v.add(neighbor); q.push({ id: neighbor, dist: dist + 1 }); } } }
             }
         }
 
         async function handleTileClick(id) {
             if (state.movesLeft <= 0 || state.isMoving || !state.reachableTiles.has(id)) return;
             const p = getPath(state.position, id);
-            state.isMoving = true; state.reachableTiles.clear();
-            updateUI();
+            state.isMoving = true; state.reachableTiles.clear(); updateUI();
             for (const step of p) {
                 await new Promise(res => setTimeout(res, 220));
                 state.position = step;
@@ -331,8 +285,7 @@
                 if (clue && !state.cluesFound.includes(clue.id)) state.cluesFound.push(clue.id);
                 updateUI();
             }
-            state.movesLeft = 0; state.isMoving = false;
-            updateUI();
+            state.movesLeft = 0; state.isMoving = false; updateUI();
         }
 
         function updateUI() {
@@ -356,19 +309,18 @@
                 const found = clue && state.cluesFound.includes(clue.id);
                 const cur = state.position === id, reach = state.reachableTiles.has(id), blue = idx % 2 === 0;
                 
-                let cls = `relative rounded border border-slate-800/40 flex items-center justify-center transition-all game-tile `;
+                let cls = `relative rounded border border-slate-800/20 flex items-center justify-center transition-all `;
                 if (cur) cls += "ring-2 ring-amber-400 z-30 shadow-lg ";
                 else if (reach) cls += "cursor-pointer hover:bg-emerald-500/30 ring-2 ring-emerald-400/40 z-20 ";
                 
-                // Keep opacity low (60%) so the board is highly visible
-                cls += blue ? "bg-[#2563eb]/60 " : "bg-white/60 ";
+                cls += blue ? "bg-[#2563eb]/50 " : "bg-white/50 ";
                 if (found) cls += "opacity-20 grayscale ";
                 
                 let inner = '';
                 if (clue && !found) inner += `<i data-lucide="search" class="w-3 h-3 ${blue?'text-white/40':'text-slate-400/40'}"></i>`;
                 if (cur) {
                     inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"><div class="bg-slate-900 rounded-full border-2 border-white w-7 h-7 md:w-10 md:h-10 flex items-center justify-center overflow-hidden shadow-xl">
-                        <img src="${patienceAvatarUrl}" class="avatar-img" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22white%22><circle cx=%2212%22 cy=%228%22 r=%224%22/><path d=%22M12 14c-4.4 0-8 3.6-8 8h16c0-4.4-3.6-8-8-8z%22/></svg>'"></div></div>`;
+                        <div class="avatar-circle"></div></div></div>`;
                 }
                 h += `<div onclick="handleTileClick('${id}')" class="${cls}">${inner}</div>`;
             }
@@ -376,12 +328,12 @@
 
             const list = document.getElementById('evidence-list');
             document.getElementById('evidence-count').innerText = `${state.cluesFound.length} / 5`;
-            if (state.cluesFound.length === 0) { list.innerHTML = `<p class="text-center text-slate-500 text-[9px] mt-4 uppercase font-bold tracking-widest">Gather Clues</p>`; }
+            if (state.cluesFound.length === 0) { list.innerHTML = `<p class="text-center text-slate-500 text-[9px] mt-4 uppercase font-bold tracking-widest">No evidence gathered yet.</p>`; }
             else {
                 let listHtml = '';
                 state.displayEvidence.forEach(ev => {
                     const found = state.cluesFound.includes(ev.id);
-                    listHtml += found ? `<div class="p-2 rounded border bg-slate-900 border-slate-600 shadow-sm animate-in fade-in"><div class="flex items-center gap-1.5 mb-0.5"><i data-lucide="${ev.icon}" class="w-2.5 h-2.5 text-blue-400"></i><span class="text-[8px] font-bold uppercase text-slate-400">EVIDENCE ITEM</span></div><p class="text-[10px] text-slate-200 leading-tight">"${ev.content}"</p></div>` : `<div class="p-2 rounded border border-dashed border-slate-700 opacity-10 flex justify-center py-2"><i data-lucide="lock" class="w-2.5 h-2.5 text-slate-500"></i></div>`;
+                    listHtml += found ? `<div class="p-2 rounded border bg-slate-900 border-slate-600 shadow-sm animate-in fade-in"><div class="flex items-center gap-1.5 mb-0.5"><i data-lucide="${ev.icon}" class="w-2.5 h-2.5 text-blue-400"></i><span class="text-[8px] font-bold uppercase text-slate-400 tracking-tight">EVIDENCE ITEM</span></div><p class="text-[10px] text-slate-200 leading-tight">"${ev.content}"</p></div>` : `<div class="p-2 rounded border border-dashed border-slate-700 opacity-10 flex justify-center py-2"><i data-lucide="lock" class="w-2.5 h-2.5 text-slate-500"></i></div>`;
                 });
                 list.innerHTML = listHtml;
             }
