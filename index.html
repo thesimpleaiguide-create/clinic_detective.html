@@ -30,8 +30,9 @@
             background-repeat: no-repeat;
             background-position: center;
             border-radius: 12px;
-            background-color: #eaddc5; /* 80s parchment fallback */
+            background-color: #eaddc5; /* Fallback color */
             position: relative;
+            border: 4px solid #1e293b;
         }
         
         #grid-container {
@@ -40,6 +41,7 @@
             position: absolute;
             top: 0;
             left: 0;
+            padding: 2px;
         }
 
         body {
@@ -48,6 +50,14 @@
             display: flex;
             flex-direction: column;
         }
+        
+        /* Make avatar image behave in the circle */
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 p-1 md:p-2 font-sans items-center">
@@ -55,31 +65,31 @@
     <!-- Slim Header -->
     <header class="w-full max-w-6xl mb-1 border-b border-slate-700 pb-1 flex justify-between items-center px-2">
         <div>
-            <h1 class="text-lg font-bold tracking-tight text-blue-400 leading-none">CLINIC DETECTIVE</h1>
+            <h1 class="text-lg font-bold tracking-tight text-blue-400 leading-none uppercase">Clinic Detective</h1>
             <p class="text-slate-400 text-[9px] uppercase tracking-wider">Agent: Patience Waites | <span id="status-text" class="text-blue-300">BRIEFING</span></p>
         </div>
         <i data-lucide="stethoscope" class="text-emerald-500 w-4 h-4"></i>
     </header>
 
     <!-- Phase 1: Briefing -->
-    <div id="phase-briefing" class="phase-active w-full max-w-lg bg-slate-800 rounded-xl p-4 border border-slate-700 shadow-2xl mt-2 mx-auto">
-        <div class="flex justify-between items-center mb-3">
+    <div id="phase-briefing" class="phase-active w-full max-w-lg bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-2xl mt-4 mx-auto">
+        <div class="flex justify-between items-center mb-4">
             <div class="flex items-center gap-2 text-emerald-400">
-                <i data-lucide="file-text" class="w-5 h-5"></i>
+                <i data-lucide="file-text" class="w-6 h-6"></i>
                 <h2 class="text-xl font-bold uppercase tracking-tight">New Assignment</h2>
             </div>
-            <!-- Character Avatar -->
-            <div class="w-16 h-16 rounded-full border-2 border-emerald-500 overflow-hidden bg-slate-900 shadow-lg ring-4 ring-emerald-500/20">
-                <img id="briefing-avatar" src="" alt="Patience Waites" class="w-full h-full object-cover">
+            <!-- Character Avatar Circle -->
+            <div class="w-16 h-16 rounded-full border-2 border-emerald-500 overflow-hidden bg-slate-900 shadow-lg ring-4 ring-emerald-500/10">
+                <img id="briefing-avatar" src="" alt="" class="avatar-img" onerror="this.style.opacity='0'">
             </div>
         </div>
         
-        <div class="space-y-3 text-slate-300 text-xs">
+        <div class="space-y-4 text-slate-300 text-xs">
             <div class="bg-slate-900/80 p-3 rounded-lg border-l-4 border-emerald-500">
                 <p class="font-mono text-[9px] text-emerald-500 mb-1 uppercase tracking-widest">Incident Report:</p>
                 <p class="italic text-slate-200">"Mr. Henderson is shouting at reception, demanding an immediate GP callback for a routine prescription query."</p>
             </div>
-            <p>Roll the dice to explore and gather evidence. <strong>Ignore Red Herrings</strong> to find the true root cause and correct response.</p>
+            <p class="leading-relaxed">Roll the dice to navigate the clinic and uncover evidence. Beware of <strong>Red Herrings</strong>—gossip and bad advice that complicate the investigation.</p>
             <button onclick="startGame()" class="w-full mt-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2 text-md shadow-lg">
                 Enter the Clinic <i data-lucide="chevron-right" class="w-4 h-4"></i>
             </button>
@@ -87,17 +97,17 @@
     </div>
 
     <!-- Phase 2: Playing -->
-    <div id="phase-playing" class="phase-hidden w-full max-w-6xl flex flex-col lg:flex-row gap-2 h-[calc(100vh-70px)] mx-auto">
+    <div id="phase-playing" class="phase-hidden w-full max-w-6xl flex flex-col lg:flex-row gap-2 h-[calc(100vh-80px)] mx-auto">
         <!-- Board & Controls -->
         <div class="flex-1 flex flex-col gap-2 overflow-hidden">
-            <div id="board-container" class="border-4 border-slate-800 shadow-inner overflow-hidden">
-                <div id="grid-container" class="grid grid-cols-10 grid-rows-8 gap-0.5 z-10 p-0.5"></div>
+            <div id="board-container">
+                <div id="grid-container" class="grid grid-cols-10 grid-rows-8 gap-0.5 z-10"></div>
             </div>
 
             <!-- Controls -->
             <div class="bg-slate-800 rounded-lg border border-slate-700 p-2 flex items-center justify-between shadow-md">
                 <div id="dice-controls" class="flex items-center gap-2"></div>
-                <button onclick="setPhase('deduction')" class="bg-amber-600 hover:bg-amber-500 text-white text-[10px] font-bold py-2 px-4 rounded-full flex items-center gap-1.5 shadow-md uppercase tracking-wider">
+                <button onclick="setPhase('deduction')" class="bg-amber-600 hover:bg-amber-500 text-white text-[10px] font-bold py-2 px-4 rounded-full flex items-center gap-1.5 shadow-md uppercase tracking-wider transition-transform active:scale-95">
                     <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
                     Deduce Now
                 </button>
@@ -109,7 +119,7 @@
             <div class="bg-slate-800 rounded-lg p-3 border border-slate-700 flex-1 flex flex-col overflow-hidden shadow-md">
                 <div class="flex justify-between items-center mb-2 pb-1 border-b border-slate-700">
                     <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                        <i data-lucide="search" class="w-3 h-3"></i> Log
+                        <i data-lucide="search" class="w-3 h-3"></i> Evidence Log
                     </h3>
                     <span id="evidence-count" class="text-[10px] font-bold text-blue-400">0 / 5</span>
                 </div>
@@ -126,15 +136,15 @@
         <div id="deduction-clue-count" class="bg-slate-900/50 p-2 rounded border border-slate-700 mb-4 text-[11px] text-slate-300 italic text-center"></div>
         <div class="space-y-3">
             <div>
-                <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-tighter">Root Cause:</label>
+                <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-tighter">Identify Root Cause:</label>
                 <select id="select-driver" onchange="checkDeductionValid()" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-xs text-slate-200 outline-none"></select>
             </div>
             <div>
-                <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-tighter">Technique:</label>
+                <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-tighter">Response Technique:</label>
                 <select id="select-tool" onchange="checkDeductionValid()" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-xs text-slate-200 outline-none"></select>
             </div>
-            <button id="btn-submit-deduction" disabled onclick="submitDeduction()" class="w-full py-2.5 rounded font-bold text-sm bg-slate-700 text-slate-500 cursor-not-allowed uppercase tracking-wider">
-                Submit Findings
+            <button id="btn-submit-deduction" disabled onclick="submitDeduction()" class="w-full py-2.5 rounded font-bold text-sm bg-slate-700 text-slate-500 cursor-not-allowed uppercase tracking-wider transition-all">
+                Submit Investigation
             </button>
         </div>
     </div>
@@ -144,12 +154,12 @@
         <div id="result-card" class="p-5 rounded-xl border shadow-2xl">
             <div class="flex items-center gap-3 mb-4">
                 <div id="result-icon-container" class="p-2.5 rounded-full"></div>
-                <div><h2 id="result-title" class="text-xl font-bold uppercase"></h2><p class="text-slate-400 text-[10px] uppercase">Review</p></div>
+                <div><h2 id="result-title" class="text-xl font-bold uppercase"></h2><p class="text-slate-400 text-[10px] uppercase tracking-widest">Performance Review</p></div>
             </div>
             <div class="space-y-3">
                 <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700"><p class="text-[9px] text-slate-500 uppercase font-bold mb-0.5">Audit</p><p id="audit-driver" class="text-slate-200 font-semibold"></p></div>
-                    <div class="bg-slate-900/80 p-2.5 rounded-lg border border-blue-500/30"><p class="text-[9px] text-blue-400 uppercase font-bold mb-0.5">Correct</p><p id="correct-driver" class="text-slate-200 font-semibold"></p></div>
+                    <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-700"><p class="text-[9px] text-slate-500 uppercase font-bold mb-0.5">Your Audit</p><p id="audit-driver" class="text-slate-200 font-semibold"></p></div>
+                    <div class="bg-slate-900/80 p-2.5 rounded-lg border border-blue-500/30"><p class="text-[9px] text-blue-400 uppercase font-bold mb-0.5">Correct Protocol</p><p id="correct-driver" class="text-slate-200 font-semibold"></p></div>
                 </div>
                 <div class="bg-slate-800/80 p-3 rounded-lg border border-slate-600 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
@@ -157,16 +167,23 @@
                     <p id="debrief-text" class="text-slate-300 text-[11px] leading-tight"></p>
                 </div>
             </div>
-            <button onclick="resetGame()" class="mt-4 w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2 rounded-lg text-xs transition-all uppercase tracking-widest">Restart Shift</button>
+            <button onclick="resetGame()" class="mt-4 w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white font-bold py-2 rounded-lg text-xs transition-all uppercase tracking-widest">Restart Assignment</button>
         </div>
     </div>
 
     <script>
-        // --- USING ABSOLUTE URLS FOR MAX COMPATIBILITY ---
-        // Note: Ensure filenames on GitHub are exactly clinic-board.jpeg and patience-avatar.jpeg
-        const baseURL = "https://thesimpleaiguide-create.github.io/";
-        const patienceAvatarUrl = baseURL + "patience-avatar.jpeg"; 
-        const boardImageUrl = baseURL + "clinic-board.jpeg";
+        // --- SMART URL DETECTION ---
+        // This calculates the folder path automatically even if embedded
+        const getAssetPath = (fileName) => {
+            const loc = window.location.pathname;
+            const dir = loc.substring(0, loc.lastIndexOf('/'));
+            // If we are at root, just return filename, else combine
+            const path = dir === "" ? fileName : dir + "/" + fileName;
+            return path + "?v=" + new Date().getTime(); // Anti-cache
+        };
+
+        const patienceAvatarUrl = getAssetPath("patience-avatar.jpeg"); 
+        const boardImageUrl = getAssetPath("clinic-board.jpeg");
         const START_POSITION = '2-8';
 
         const pathSpaces = [
@@ -207,28 +224,27 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Apply background image to container
+            // Remove trailing slash from URL if user typed it (breaks relative paths)
+            if (window.location.pathname.endsWith('/')) {
+                const newPath = window.location.pathname.slice(0, -1);
+                window.history.replaceState(null, null, newPath);
+            }
+
+            // Set background
             const boardContainer = document.getElementById('board-container');
-            
-            // Force browser to treat this as an image background
-            const img = new Image();
-            img.onload = function() {
-                boardContainer.style.backgroundImage = `url('${boardImageUrl}')`;
-            };
-            img.src = boardImageUrl;
+            const bgImg = new Image();
+            bgImg.onload = () => boardContainer.style.backgroundImage = `url('${boardImageUrl}')`;
+            bgImg.src = boardImageUrl;
             
             // Set briefing avatar
             const briefingImg = document.getElementById('briefing-avatar');
-            if(briefingImg) {
-                briefingImg.src = patienceAvatarUrl;
-            }
+            if(briefingImg) briefingImg.src = patienceAvatarUrl;
 
             // Populate selects
             const dSelect = document.getElementById('select-driver');
             driversList.forEach(d => { const o = document.createElement('option'); o.value = d; o.innerText = d; dSelect.appendChild(o); });
             const tSelect = document.getElementById('select-tool');
             toolsList.forEach(t => { const o = document.createElement('option'); o.value = t; o.innerText = t; tSelect.appendChild(o); });
-            
             lucide.createIcons();
         });
 
@@ -241,7 +257,7 @@
                 else { el.classList.remove('phase-active'); el.classList.add('phase-hidden'); }
             });
             if (newPhase === 'deduction') {
-                document.getElementById('deduction-clue-count').innerText = `Evidence: ${state.cluesFound.length} items collected.`;
+                document.getElementById('deduction-clue-count').innerText = `INVESTIGATION LOG: ${state.cluesFound.length} PIECES OF EVIDENCE COLLECTED.`;
             }
         }
 
@@ -321,11 +337,11 @@
             const ctrl = document.getElementById('dice-controls');
             if (state.movesLeft <= 0) {
                 ctrl.innerHTML = `<button onclick="rollDice()" ${state.isRolling || state.isMoving ? 'disabled opacity-50' : ''} class="bg-blue-600 text-white font-bold py-1.5 px-4 rounded-full flex items-center gap-1.5 shadow-md">
-                    <i data-lucide="dices" class="w-4 h-4 ${state.isRolling ? 'animate-spin' : ''}"></i><span class="text-[10px] uppercase tracking-tighter">${state.isRolling ? '...' : 'Roll'}</span></button>`;
+                    <i data-lucide="dices" class="w-4 h-4 ${state.isRolling ? 'animate-spin' : ''}"></i><span class="text-[10px] uppercase tracking-tighter">${state.isRolling ? '...' : 'Roll Dice'}</span></button>`;
             } else {
                 ctrl.innerHTML = `<div class="flex items-center gap-2 bg-emerald-900/30 border border-emerald-500/50 text-emerald-400 px-2 py-1 rounded-full font-bold">
                     <div class="flex items-center justify-center bg-emerald-500 text-slate-900 w-5 h-5 rounded text-[10px] font-black">${state.diceRoll}</div>
-                    <i data-lucide="footprints" class="w-3 h-3 animate-pulse"></i><span class="text-[9px] uppercase tracking-tighter">${state.isMoving ? 'Moving' : `${state.movesLeft} Left`}</span></div>`;
+                    <i data-lucide="footprints" class="w-3 h-3 animate-pulse"></i><span class="text-[9px] uppercase tracking-tighter">${state.isMoving ? 'Moving' : `${state.movesLeft} Moves`}</span></div>`;
             }
 
             const grid = document.getElementById('grid-container');
@@ -337,16 +353,20 @@
                 const clue = caseFile.evidence.find(e => e.boardPos === id);
                 const found = clue && state.cluesFound.includes(clue.id);
                 const cur = state.position === id, reach = state.reachableTiles.has(id), blue = idx % 2 === 0;
-                let cls = `relative rounded border border-slate-800 flex items-center justify-center transition-all `;
+                
+                let cls = `relative rounded border border-slate-800/50 flex items-center justify-center transition-all `;
                 if (cur) cls += "ring-2 ring-amber-400 z-30 shadow-md ";
                 else if (reach) cls += "cursor-pointer hover:bg-emerald-500/20 ring-2 ring-emerald-400/50 z-20 ";
-                cls += blue ? "bg-[#2563eb]/70 " : "bg-white/70 ";
-                if (found) cls += "opacity-30 grayscale ";
+                
+                // Lower tile opacity to show board underneath
+                cls += blue ? "bg-[#2563eb]/60 " : "bg-white/60 ";
+                if (found) cls += "opacity-20 grayscale ";
+                
                 let inner = '';
-                if (clue && !found) inner += `<i data-lucide="search" class="w-3 h-3 ${blue?'text-white/30':'text-slate-400/30'}"></i>`;
+                if (clue && !found) inner += `<i data-lucide="search" class="w-3 h-3 ${blue?'text-white/40':'text-slate-400/40'}"></i>`;
                 if (cur) {
                     inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"><div class="bg-slate-900 rounded-full border-2 border-white w-6 h-6 md:w-9 md:h-9 flex items-center justify-center overflow-hidden shadow-xl">
-                        <img src="${patienceAvatarUrl}" class="w-full h-full object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Patience'"></div></div>`;
+                        <img src="${patienceAvatarUrl}" class="avatar-img" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Patience'"></div></div>`;
                 }
                 h += `<div onclick="handleTileClick('${id}')" class="${cls}">${inner}</div>`;
             }
@@ -354,12 +374,12 @@
 
             const list = document.getElementById('evidence-list');
             document.getElementById('evidence-count').innerText = `${state.cluesFound.length} / 5`;
-            if (state.cluesFound.length === 0) { list.innerHTML = `<p class="text-center text-slate-500 text-[9px] mt-4 uppercase">Roll to find clues.</p>`; }
+            if (state.cluesFound.length === 0) { list.innerHTML = `<p class="text-center text-slate-500 text-[9px] mt-4 uppercase">No evidence gathered yet.</p>`; }
             else {
                 let listHtml = '';
                 state.displayEvidence.forEach(ev => {
                     const found = state.cluesFound.includes(ev.id);
-                    listHtml += found ? `<div class="p-2 rounded border bg-slate-900 border-slate-600 shadow-sm animate-in fade-in"><div class="flex items-center gap-1.5 mb-0.5"><i data-lucide="${ev.icon}" class="w-2.5 h-2.5 text-blue-400"></i><span class="text-[8px] font-bold uppercase text-slate-400 tracking-tight">Observation</span></div><p class="text-[10px] text-slate-200 leading-tight">"${ev.content}"</p></div>` : `<div class="p-2 rounded border border-dashed border-slate-700 opacity-20 flex justify-center py-2"><i data-lucide="lock" class="w-2.5 h-2.5 text-slate-500"></i></div>`;
+                    listHtml += found ? `<div class="p-2 rounded border bg-slate-900 border-slate-600 shadow-sm animate-in fade-in"><div class="flex items-center gap-1.5 mb-0.5"><i data-lucide="${ev.icon}" class="w-2.5 h-2.5 text-blue-400"></i><span class="text-[8px] font-bold uppercase text-slate-400 tracking-tight">EVIDENCE ITEM</span></div><p class="text-[10px] text-slate-200 leading-tight">"${ev.content}"</p></div>` : `<div class="p-2 rounded border border-dashed border-slate-700 opacity-10 flex justify-center py-2"><i data-lucide="lock" class="w-2.5 h-2.5 text-slate-500"></i></div>`;
                 });
                 list.innerHTML = listHtml;
             }
@@ -368,15 +388,15 @@
 
         function checkDeductionValid() {
             const d = document.getElementById('select-driver').value, t = document.getElementById('select-tool').value, btn = document.getElementById('btn-submit-deduction');
-            if (d && t) { btn.disabled = false; btn.className = "w-full py-2.5 rounded font-bold text-sm bg-emerald-600 text-white cursor-pointer uppercase tracking-wider"; }
+            if (d && t) { btn.disabled = false; btn.className = "w-full py-2.5 rounded font-bold text-sm bg-emerald-600 text-white cursor-pointer uppercase tracking-wider transition-all"; }
             else { btn.disabled = true; btn.className = "w-full py-2.5 rounded font-bold text-sm bg-slate-700 text-slate-500 cursor-not-allowed uppercase tracking-wider"; }
         }
 
         function submitDeduction() {
             const d = document.getElementById('select-driver').value, t = document.getElementById('select-tool').value, correct = (d === caseFile.correct.driver && t === caseFile.correct.tool);
             const card = document.getElementById('result-card'), icon = document.getElementById('result-icon-container');
-            if (correct) { card.className = "p-5 rounded-xl border bg-emerald-900/20 border-emerald-500 shadow-xl"; icon.className = "bg-emerald-500 p-2.5 rounded-full"; icon.innerHTML = `<i data-lucide="check" class="w-5 h-5 text-white"></i>`; document.getElementById('result-title').innerText = "Case Solved"; }
-            else { card.className = "p-5 rounded-xl border bg-rose-900/20 border-rose-500 shadow-xl"; icon.className = "bg-rose-500 p-2.5 rounded-full"; icon.innerHTML = `<i data-lucide="x" class="w-5 h-5 text-white"></i>`; document.getElementById('result-title').innerText = "Review Needed"; }
+            if (correct) { card.className = "p-5 rounded-xl border bg-emerald-900/20 border-emerald-500 shadow-xl"; icon.className = "bg-emerald-500 p-2.5 rounded-full"; icon.innerHTML = `<i data-lucide="check" class="w-5 h-5 text-white"></i>`; document.getElementById('result-title').innerText = "Investigation Successful"; }
+            else { card.className = "p-5 rounded-xl border bg-rose-900/20 border-rose-500 shadow-xl"; icon.className = "bg-rose-500 p-2.5 rounded-full"; icon.innerHTML = `<i data-lucide="x" class="w-5 h-5 text-white"></i>`; document.getElementById('result-title').innerText = "Inconclusive Findings"; }
             document.getElementById('audit-driver').innerText = d; document.getElementById('correct-driver').innerText = caseFile.correct.driver; document.getElementById('debrief-text').innerText = caseFile.correct.reason;
             setPhase('result'); lucide.createIcons();
         }
