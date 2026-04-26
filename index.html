@@ -204,8 +204,9 @@
 
     <script>
         // --- GAME DATA & CONFIGURATION ---
-        const patienceAvatarUrl = "https://your-github-username.github.io/repo/patience-avatar.jpeg"; 
-        const boardImageUrl = "https://your-github-username.github.io/repo/clinic-board.jpeg";
+        // Using relative paths ensures it finds the images in the same folder as this HTML file
+        const patienceAvatarUrl = "./patience-avatar.jpeg"; 
+        const boardImageUrl = "./clinic-board.jpeg";
 
         const START_POSITION = '2-8';
         const TOTAL_GRID_CELLS = 80;
@@ -257,7 +258,7 @@
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
             // Apply background image
-            document.getElementById('board-container').style.backgroundImage = `url(${boardImageUrl})`;
+            document.getElementById('board-container').style.backgroundImage = `url('${boardImageUrl}')`;
             
             // Populate select dropdowns
             const driverSelect = document.getElementById('select-driver');
