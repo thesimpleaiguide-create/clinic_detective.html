@@ -20,7 +20,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Board Logic optimized for iframe embeds */
+        /* Fixed Board Logic for Embeds */
         #board-container {
             max-height: 58vh; 
             width: 100%;
@@ -30,12 +30,16 @@
             background-repeat: no-repeat;
             background-position: center;
             border-radius: 12px;
-            background-color: #eaddc5; /* Fallback color matching the 80s board */
+            background-color: #eaddc5; /* 80s parchment fallback */
+            position: relative;
         }
         
         #grid-container {
             width: 100%;
             height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         body {
@@ -86,8 +90,8 @@
     <div id="phase-playing" class="phase-hidden w-full max-w-6xl flex flex-col lg:flex-row gap-2 h-[calc(100vh-70px)] mx-auto">
         <!-- Board & Controls -->
         <div class="flex-1 flex flex-col gap-2 overflow-hidden">
-            <div id="board-container" class="border-4 border-slate-800 shadow-inner relative overflow-hidden">
-                <div id="grid-container" class="grid grid-cols-10 grid-rows-8 gap-0.5 relative z-10 p-0.5"></div>
+            <div id="board-container" class="border-4 border-slate-800 shadow-inner overflow-hidden">
+                <div id="grid-container" class="grid grid-cols-10 grid-rows-8 gap-0.5 z-10 p-0.5"></div>
             </div>
 
             <!-- Controls -->
@@ -159,6 +163,7 @@
 
     <script>
         // --- USING ABSOLUTE URLS FOR MAX COMPATIBILITY ---
+        // Note: Ensure filenames on GitHub are exactly clinic-board.jpeg and patience-avatar.jpeg
         const baseURL = "https://thesimpleaiguide-create.github.io/";
         const patienceAvatarUrl = baseURL + "patience-avatar.jpeg"; 
         const boardImageUrl = baseURL + "clinic-board.jpeg";
@@ -182,7 +187,7 @@
             correct: {
                 driver: "Fear/Losing Control",
                 tool: "Miller's Law & Fairness Frame",
-                reason: "The patient was 'taking the bait' of technology to express his fear of being de-prioritized. The staff member used a 'Rules Frame' which escalated his sense of powerlessness. Empathy and fairness dismantle this behavior."
+                reason: "The patient was 'taking the bait' of technology to express his fear of being de-prioritized. Empathy and fairness dismantle this behavior."
             }
         };
 
@@ -202,19 +207,28 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Apply background image absolute URL
-            document.getElementById('board-container').style.backgroundImage = `url('${boardImageUrl}')`;
+            // Apply background image to container
+            const boardContainer = document.getElementById('board-container');
             
-            // Set briefing avatar absolute URL
+            // Force browser to treat this as an image background
+            const img = new Image();
+            img.onload = function() {
+                boardContainer.style.backgroundImage = `url('${boardImageUrl}')`;
+            };
+            img.src = boardImageUrl;
+            
+            // Set briefing avatar
             const briefingImg = document.getElementById('briefing-avatar');
             if(briefingImg) {
                 briefingImg.src = patienceAvatarUrl;
             }
 
+            // Populate selects
             const dSelect = document.getElementById('select-driver');
             driversList.forEach(d => { const o = document.createElement('option'); o.value = d; o.innerText = d; dSelect.appendChild(o); });
             const tSelect = document.getElementById('select-tool');
             toolsList.forEach(t => { const o = document.createElement('option'); o.value = t; o.innerText = t; tSelect.appendChild(o); });
+            
             lucide.createIcons();
         });
 
@@ -326,13 +340,13 @@
                 let cls = `relative rounded border border-slate-800 flex items-center justify-center transition-all `;
                 if (cur) cls += "ring-2 ring-amber-400 z-30 shadow-md ";
                 else if (reach) cls += "cursor-pointer hover:bg-emerald-500/20 ring-2 ring-emerald-400/50 z-20 ";
-                cls += blue ? "bg-[#2563eb]/80 " : "bg-white/80 ";
+                cls += blue ? "bg-[#2563eb]/70 " : "bg-white/70 ";
                 if (found) cls += "opacity-30 grayscale ";
                 let inner = '';
                 if (clue && !found) inner += `<i data-lucide="search" class="w-3 h-3 ${blue?'text-white/30':'text-slate-400/30'}"></i>`;
                 if (cur) {
                     inner += `<div class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"><div class="bg-slate-900 rounded-full border-2 border-white w-6 h-6 md:w-9 md:h-9 flex items-center justify-center overflow-hidden shadow-xl">
-                        <img src="${patienceAvatarUrl}" class="w-full h-full object-cover"></div></div>`;
+                        <img src="${patienceAvatarUrl}" class="w-full h-full object-cover" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Patience'"></div></div>`;
                 }
                 h += `<div onclick="handleTileClick('${id}')" class="${cls}">${inner}</div>`;
             }
